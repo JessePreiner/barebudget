@@ -35,7 +35,13 @@ app
     res.json(expenses);
 })
   .get('/expenses/:id', function(req, res) {
-    res.json(expenses.filter(function(x,y,z) { x.id = req.param.id}));
+    if (req.param.id > 0 ) {
+      var id = req.query.id;
+      if (id != null) {
+      }
+        res.json(expenses.filter(function(x,y,z) { x.id == req.param.id}));
+   }
+   res.status(404).send();
 })
   .listen(PORT, function() {
     console.log('Express listening on port ' + PORT);
