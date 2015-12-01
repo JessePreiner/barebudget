@@ -21,7 +21,7 @@ var expenses = [
   {
     id: 3,
     description: "third expense",
-    category:"erotica",
+    category:"other",
     overdue: true,
     paid: 0,
     owing: 100
@@ -31,12 +31,11 @@ app
   .get('/', function(req, res) {
     res.send('budget api');
 })
-  .get('/expenses', function(req, res) {
+  .get('/expenses/', function(req, res) {
     res.json(expenses);
 })
   .get('/expenses/:id', function(req, res) {
-    res.send('looking for ' + req.params.id);
-    res.json(expenses);
+    res.json(expenses.filter(function(x,y,z) { x.id = req.param.id}));
 })
   .listen(PORT, function() {
     console.log('Express listening on port ' + PORT);
