@@ -1,32 +1,12 @@
 var express = require('express');
+var bodyParser = require('body-parser');
+
 var app = express();
 var PORT = process.env.PORT || 3000;
-var expenses = [
-  {
-    id: 1,
-    description: "first expense",
-    category:"automotive",
-    overdue: false,
-    paid: 0,
-    owing: 100
-  },
-  {
-    id: 2,
-    description: "second expense",
-    category:"home",
-    overdue: false,
-    paid: 200,
-    owing: 0
-  },
-  {
-    id: 3,
-    description: "third expense",
-    category:"other",
-    overdue: true,
-    paid: 0,
-    owing: 100
-  }
-];
+var expenseNextId = 1;
+var expenses = [];
+
+app.use(bodyParser.json());
 app
   .get('/', function(req, res) {
     res.send('budget api');
@@ -35,14 +15,23 @@ app
     res.json(expenses);
 })
   .get('/expenses/:id', function(req, res) {
-    if (req.param.id > 0 ) {
-      var id = req.query.id;
-      if (id != null) {
-      }
-        res.json(expenses.filter(function(x,y,z) { x.id == req.param.id}));
-   }
-   res.status(404).send();
-})
+      var id = parseInt(req.params.id, 10);
+
+      expenses.forEach(function(x) {
+        if (x.id === id) {
+          res.json(x);
+        }
+      });
+      res.status(404).send();
+   })
+   .post('/expenses', function(req, res) {
+     var body = req.body;
+     body.id = expenseNextId++;
+     expenses.push(body);
+     res.json(body);
+   })
+
+
   .listen(PORT, function() {
     console.log('Express listening on port ' + PORT);
 });
