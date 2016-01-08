@@ -5,15 +5,38 @@ var _ = require('underscore');
 var app = express();
 var PORT = process.env.PORT || 3000;
 var expenseNextId = 1;
-var expenses = [];
+var expenses = [
+    {
+    "description": "Things to purchase for around the house",
+    "category": "household",
+    "id": 1
+  },
+  {
+    "description": "Items for yard work",
+    "category": "yard",
+    "id": 2
+  },
+  {
+    "description": "Expenses for automotobiles, including fuel, maintenence, and general upkeep",
+    "category": "auto",
+    "id": 3
+  }
+];
 
 app.use(bodyParser.json());
 app
   .get('/', function(req, res) {
-    res.send('budget api');
+    res.send('budget api homepage');
   })
   .get('/expenses/', function(req, res) {
-    res.json(expenses);
+    var query = req.query;
+    var order = query.order || 'asc';
+    var sortColumn = query.sortCol || 'category'
+    if (order === 'desc') {
+      res.json(_.sortBy(expenses, sortColumn).reverse());
+    } else {
+      res.json(_.sortBy(expenses, sortColumn));  
+    }
   })
   .get('/expenses/:id', function(req, res) {
 
@@ -21,19 +44,17 @@ app
     var result = _.findWhere(expenses, {
       id: id
     });
+  
     if (result) {
       res.json(result);
     }
     res.status(404).send();
-
-
   })
   .post('/expenses', function(req, res) {
-    var body = _.pick(req.body, 'description', 'category');
+    
+  var body = _.pick(req.body, 'description', 'category');
 
-    if (!_.isString(body.category) ||
-      !_.isString(body.description) ||
-      body.description.trim().length === 0) {
+    if (!_.isString(body.category) || !_.isString(body.description) || body.description.trim().length === 0) {
       return res.status(400).send();
     }
 
